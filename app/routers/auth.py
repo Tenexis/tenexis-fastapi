@@ -27,7 +27,7 @@ def login_google(request: GoogleLoginRequest, session: Session = Depends(get_ses
         statement = select(College).where(text(f"'{domain}' LIKE '%' || domain"))
         known_college = session.exec(statement).first()
         
-        college_id = known_college.id if known_college else None
+        college_slug = known_college.slug if known_college else None
         is_verified = True if known_college else False
         
         # B. Generate Unique Username
@@ -38,7 +38,7 @@ def login_google(request: GoogleLoginRequest, session: Session = Depends(get_ses
             username=new_username,
             name=google_user.get("name"),
             picture=google_user.get("picture"),
-            college_id=college_id,
+            college_slug=college_slug,
             is_college_verified=is_verified
         )
         session.add(user)
@@ -46,23 +46,21 @@ def login_google(request: GoogleLoginRequest, session: Session = Depends(get_ses
         session.refresh(user)
     else:
         # If user exists, load their college for the token slug
-        if user.college_id:
+        if user.college_slug:
             known_college = user.college
 
-    # Determine slug safely for token
-    c_slug = None
-    if known_college:
-        c_slug = known_college.slug
-    elif user.college:
-        c_slug = user.college.slug
+    is_onboarded = False
+    if user.phone_number and user.gender and user.college_slug:
+        is_onboarded = True
 
     access_token = create_access_token(
         data={
             "sub": user.email, 
             "user_id": user.id,
             "username": user.username,
-            "college_slug": c_slug,
-            "is_verified": user.is_college_verified
+            "college_slug": user.college_slug,
+            "is_verified": user.is_college_verified,
+            "is_onboarded": is_onboarded
         }
     )
 

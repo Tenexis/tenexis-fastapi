@@ -30,3 +30,4 @@ tenexis-fastapi/
         ├── users.py
         └── colleges.py
 ```
+pip install Pillow python-multipart
