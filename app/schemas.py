@@ -2,6 +2,16 @@ from pydantic import BaseModel
 from typing import Optional, List
 from app.models import ProductType, ProductVisibility
 
+class ProductRead(BaseModel):
+    id: int
+    title: str
+    description: str | None
+    price: float
+    # Add other product fields you want to send, but NOT the 'user' relationship
+    
+    class Config:
+        from_attributes = True
+
 # --- Response Models (Read) ---
 class CollegeRead(BaseModel):
     name: str
@@ -19,10 +29,11 @@ class UserRead(BaseModel):
     is_phone_verified: bool
     gender: str | None
     roll_number: str | None
+    official_name: str | None
     college_slug: str | None
     is_college_verified: bool
-    # Simplified College object to prevent infinite loops
     college: Optional[CollegeRead] = None
+    products: List[ProductRead] = []
 
 # --- Request Models ---
 class GoogleLoginRequest(BaseModel):
