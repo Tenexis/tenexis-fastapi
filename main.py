@@ -8,7 +8,6 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "https://your-frontend-domain.pages.dev", # Your Cloudflare URL
     "https://hdtr68dq-3000.inc1.devtunnels.ms",
     "https://tenexis-thrift.tenexis.workers.dev",
     "https://tenexis.com",
